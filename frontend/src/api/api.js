@@ -21,5 +21,11 @@ export const requestLogin = params => {
 };
 
 export const requestUpdateUser = params => { 
-  return myAxios.post('/user/update', params).then(data => data.data); 
+  return myAxios.post('/userupdate', params).then(data => data.data); 
 };
+
+
+export const getUserInfo = params => {
+  return myAxios.get('/userinfo').then(data => data.data)
+
+}

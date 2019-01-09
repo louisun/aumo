@@ -5,10 +5,7 @@
       <div class="sep20"></div>
       <el-card class="box-card" :body-style="{padding: '10px'}">
         <div class="clearfix" id="card-header">
-          <img
-            :src="$store.state.user.avatar_path"
-            id="card-avatar"
-          >
+          <img :src="$store.state.user.avatar_path" id="card-avatar">
           <div id="card-user-name">
             <span>
               <a href="#">{{$store.state.user.nickname}}</a>
@@ -99,7 +96,7 @@
               <el-button
                 type="primary"
                 @click.prevent="submitPasswordForm('userPasswordForm')"
-                :loading="loading1"
+                :loading="loading2"
               >重置密码</el-button>
             </el-form-item>
           </el-form>
@@ -111,7 +108,7 @@
   </div>
 </template>
 <script>
-import { requestUpdateUser } from "../api/api";
+import { requestUpdateUser, getUserInfo } from "../api/api";
 export default {
   data() {
     var validatePass = (rule, value, callback) => {
@@ -184,17 +181,49 @@ export default {
       }
     };
   },
+  created: function() {
+    getUserInfo().then(data => {
+      let code = data.returnCode;
+      let msg = data.returnMsg;
+      let returnData = data.returnData;
+      if (code !== "200") {
+        this.$message({
+          message: msg,
+          type: "error"
+        });
+      }
+      else{
+            this.$store.state.user.email = returnData.email;
+            this.$store.state.user.nickname = returnData.nickname;
+            if(returnData.moto != ''){
+              this.$store.state.user.moto = returnData.moto;
+            }
+            else{
+              this.$store.state.user.moto = '好好学习，天天向上';
+            }
+            if(returnData.avatar_path != ''){
+              this.$store.state.user.avatar_path = returnData.avatar_path;
+            }
+            else{
+              this.$store.state.user.avatar_path = 'https://bucket-1255905387.cos.ap-shanghai.myqcloud.com/2018-12-23-09-42-03_r2.png';
+            }
+            this.userInfoForm.moto = this.$store.state.user.moto;
+            this.userInfoForm.nickname = this.$store.state.user.nickname;
+      }
+    });
+  },
   methods: {
     submitInfoForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
           this.loading1 = true;
-          var loginParams = {
+          var params = {
+            type: 'userInfo',
             email: this.$store.state.user.email,
             nickname: this.userInfoForm.nickname,
             moto: this.userInfoForm.moto
           };
-          requestUpdateUser(loginParams).then(data => {
+          requestUpdateUser(params).then(data => {
             this.loading1 = false;
             let code = data.returnCode;
             let msg = data.returnMsg;
@@ -204,8 +233,7 @@ export default {
                 message: msg,
                 type: "error"
               });
-            }
-            else{
+            } else {
               this.$message({
                 message: returnData,
                 type: "success"
@@ -219,7 +247,37 @@ export default {
       });
     },
     submitPasswordForm(formName) {
-      this.$refs[formName].resetFields();
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          this.loading2 = true;
+          var params = {
+            type: 'userPassword',
+            email: this.$store.state.user.email,
+            currentPassword: this.userPasswordForm.currentPassword,
+            newPassword: this.userPasswordForm.newPassword
+          };
+          requestUpdateUser(params).then(data => {
+            this.loading2 = false;
+            let code = data.returnCode;
+            let msg = data.returnMsg;
+            let returnData = data.returnData;
+            if (code !== "200") {
+              this.$message({
+                message: msg,
+                type: "error"
+              });
+            } else {
+              this.$message({
+                message: returnData,
+                type: "success"
+              });
+            }
+          });
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
     }
   }
 };

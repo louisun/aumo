@@ -7,6 +7,8 @@ public interface UserService {
 
     public JSONObject getUserById(int id);
 
+    public JSONObject getUserBasicInfoByEmail(String email);
+
     public JSONObject getUserByEmail(String email);
 
     public JSONObject updateUserById(User user);

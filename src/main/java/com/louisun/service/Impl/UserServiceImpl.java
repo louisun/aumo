@@ -24,7 +24,23 @@ public class UserServiceImpl implements UserService {
     @Override
     public JSONObject getUserByEmail(String email) {
         User user = userMapper.selectUserByEmail(email);
-        if(user!=null) return JsonResult.successResult(user);
+        if(user!=null){
+            return JsonResult.successResult(user);
+        }
+        else return JsonResult.errorResult(ErrorEnum.E_1003); // 用户不存在
+    }
+
+    @Override
+    public JSONObject getUserBasicInfoByEmail(String email) {
+        User user = userMapper.selectUserByEmail(email);
+        if(user!=null){
+            JSONObject jsonResult = new JSONObject();
+            jsonResult.put("email", user.getEmail());
+            jsonResult.put("nickname", user.getNickname());
+            jsonResult.put("moto", user.getMoto());
+            jsonResult.put("avatar_path", user.getAvatarPath());
+            return JsonResult.successResult(jsonResult);
+        }
         else return JsonResult.errorResult(ErrorEnum.E_1003); // 用户不存在
     }
 

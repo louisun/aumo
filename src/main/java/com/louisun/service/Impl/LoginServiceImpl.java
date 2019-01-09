@@ -38,6 +38,7 @@ public class LoginServiceImpl implements LoginService {
             jsonResult.put("nickname", user.getNickname());
             jsonResult.put("moto", user.getMoto());
             jsonResult.put("avatar_path", user.getAvatarPath());
+
             return JsonResult.successResult(jsonResult);
         } catch (AuthenticationException e) {
             return JsonResult.errorResult(ErrorEnum.E_2001);

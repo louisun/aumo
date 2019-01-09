@@ -154,3 +154,5 @@ typings/
 
 # DynamoDB Local files
 .dynamodb/
+frontend/src/utils/
+src/test/

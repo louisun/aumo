@@ -11,7 +11,7 @@ public interface TagService {
      * @author YeJianan
      * @date 2019/1/28 16:10
      */
-    JSONObject getAllTags();
+    public JSONObject getAllTags();
 
     /*
      * 根据tag_id来获取这个tag的名字
@@ -20,7 +20,16 @@ public interface TagService {
      * @author YeJianan
      * @date 2019/1/28 16:10
      */
-    String getTagById(int tag_id);
+    public String getTagById(int tag_id);
+
+    /*
+     * 表示插入一个新的tag
+     * @param name
+     * @return com.alibaba.fastjson.JSONObject
+     * @author YeJianan
+     * @date 2019/1/28 20:18
+     */
+    public JSONObject insertTag(String name);
 
 
 }

@@ -1,6 +1,7 @@
 package com.louisun.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.louisun.model.Comment;
 
 public interface CommentService {
 
@@ -11,7 +12,7 @@ public interface CommentService {
      * @author YeJianan
      * @date 2019/1/28 16:00
      */
-    public JSONObject insertComment(JSONObject jsonObject);
+    public JSONObject insertComment(Comment comment);
 
     /*
      * 根据文章的id来获取所有的评论
@@ -40,12 +41,4 @@ public interface CommentService {
      */
     public JSONObject deleteCommentByCommentId(int comment_id);
 
-    /*
-     * 直接插入一个新的tag
-     * @param tag
-     * @return void
-     * @author YeJianan
-     * @date 2019/1/28 16:20
-     */
-    public void addTag(String tag);
 }

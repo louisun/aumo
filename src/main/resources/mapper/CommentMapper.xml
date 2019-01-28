@@ -17,10 +17,23 @@
     </delete>
 
     <insert id="insertComment" parameterType="com.louisun.model.Comment">
-        insert into comment (comment_id, user_id, post_id,
-                             content, to_comment_id, create_time)
-        values (#{commentId,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, #{postId,jdbcType=INTEGER},
-                #{content,jdbcType=CHAR}, #{toCommentId,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP})
+        insert into comment
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="toCommentId!= null">
+                to_comment_id,
+            </if>
+            user_id,
+            post_id,
+            content
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="toCommentId!= null">
+                #{toCommentId,jdbcType=INTEGER},
+            </if>
+            #{userId,jdbcType=INTEGER},
+            #{postId,jdbcType=INTEGER},
+            #{content,jdbcType=CHAR}
+        </trim>
     </insert>
 
 

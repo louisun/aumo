@@ -5,6 +5,7 @@
         <id column="tag_id" jdbcType="INTEGER" property="tagId"/>
         <result column="name" jdbcType="VARCHAR" property="name"/>
     </resultMap>
+
     <sql id="Base_Column_List">
         tag_id,
         name
@@ -15,14 +16,22 @@
         from tag
         where tag_id = #{tagId,jdbcType=INTEGER}
     </select>
+
+    <select id="selectAlltag" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tag
+    </select>
+
+
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
         delete
         from tag
         where tag_id = #{tagId,jdbcType=INTEGER}
     </delete>
-    <insert id="insert" parameterType="com.louisun.model.Tag">
-        insert into tag (tag_id, name)
-        values (#{tagId,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR})
+    <insert id="insert" parameterType="java.lang.String">
+        insert into tag(name)
+        values (#{name,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" parameterType="com.louisun.model.Tag">
         insert into tag

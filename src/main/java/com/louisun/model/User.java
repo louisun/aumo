@@ -57,4 +57,6 @@ public class User {
      * 用户更新时间
      */
     private Date updateTime;
+
+
 }

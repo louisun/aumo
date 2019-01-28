@@ -103,12 +103,28 @@
         </div>
       </div>
       <div class="sep20"></div>
+      <div class="main-box">
+        <div class="main-header" style="border-bottom: 1px solid #e2e2e2">更改头像</div>
+        <el-upload
+          class="avatar-uploader"
+          :action="uploadAvatarURL"
+          :show-file-list="false"
+          :on-success="handleAvatarSuccess"
+          :before-upload="beforeAvatarUpload"
+          enctype="multipart/form-data"
+          with-credentials
+        >
+          <img v-if="imageUrl" :src="imageUrl" class="avatar">
+          <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+        </el-upload>
+      </div>
+      <div class="sep20"></div>
       <div class="sep20"></div>
     </div>
   </div>
 </template>
 <script>
-import { requestUpdateUser, getUserInfo } from "../api/api";
+import { requestUpdateUser, getUserInfo, uploadAvatarURL } from "../api/api";
 export default {
   data() {
     var validatePass = (rule, value, callback) => {
@@ -151,6 +167,8 @@ export default {
       }
     };
     return {
+      uploadAvatarURL: uploadAvatarURL,
+      imageUrl: "",
       loading1: false,
       loading2: false,
       userInfoForm: {
@@ -191,34 +209,48 @@ export default {
           message: msg,
           type: "error"
         });
-      }
-      else{
-            this.$store.state.user.email = returnData.email;
-            this.$store.state.user.nickname = returnData.nickname;
-            if(returnData.moto != ''){
-              this.$store.state.user.moto = returnData.moto;
-            }
-            else{
-              this.$store.state.user.moto = '好好学习，天天向上';
-            }
-            if(returnData.avatar_path != ''){
-              this.$store.state.user.avatar_path = returnData.avatar_path;
-            }
-            else{
-              this.$store.state.user.avatar_path = 'https://bucket-1255905387.cos.ap-shanghai.myqcloud.com/2018-12-23-09-42-03_r2.png';
-            }
-            this.userInfoForm.moto = this.$store.state.user.moto;
-            this.userInfoForm.nickname = this.$store.state.user.nickname;
+      } else {
+        this.$store.state.user.email = returnData.email;
+        this.$store.state.user.nickname = returnData.nickname;
+        if (returnData.moto != "") {
+          this.$store.state.user.moto = returnData.moto;
+        } else {
+          this.$store.state.user.moto = "好好学习，天天向上";
+        }
+        if (returnData.avatar_path != "") {
+          this.$store.state.user.avatar_path = returnData.avatar_path;
+        } else {
+          this.$store.state.user.avatar_path =
+            "https://bucket-1255905387.cos.ap-shanghai.myqcloud.com/2018-12-23-09-42-03_r2.png";
+        }
+        this.userInfoForm.moto = this.$store.state.user.moto;
+        this.userInfoForm.nickname = this.$store.state.user.nickname;
       }
     });
   },
   methods: {
+    handleAvatarSuccess(res, file) {
+      this.imageUrl = URL.createObjectURL(file.raw);
+      console.log(this.imageUrl);
+    },
+    beforeAvatarUpload(file) {
+      const isJPG = file.type === "image/jpeg";
+      const isLt2M = file.size / 1024 / 1024 < 2;
+
+      if (!isJPG) {
+        this.$message.error("上传头像图片只能是 JPG 格式!");
+      }
+      if (!isLt2M) {
+        this.$message.error("上传头像图片大小不能超过 2MB!");
+      }
+      return isJPG && isLt2M;
+    },
     submitInfoForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
           this.loading1 = true;
-          var params = {
-            type: 'userInfo',
+          let params = {
+            type: "userInfo",
             email: this.$store.state.user.email,
             nickname: this.userInfoForm.nickname,
             moto: this.userInfoForm.moto
@@ -250,8 +282,8 @@ export default {
       this.$refs[formName].validate(valid => {
         if (valid) {
           this.loading2 = true;
-          var params = {
-            type: 'userPassword',
+          let params = {
+            type: "userPassword",
             email: this.$store.state.user.email,
             currentPassword: this.userPasswordForm.currentPassword,
             newPassword: this.userPasswordForm.newPassword
@@ -375,6 +407,29 @@ export default {
         margin-top: 30px;
       }
     }
+  }
+  .avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .avatar-uploader .el-upload:hover {
+    border-color: #409eff;
+  }
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+  }
+  .avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
   }
 }
 </style>

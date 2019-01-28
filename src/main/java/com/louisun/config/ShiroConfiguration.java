@@ -29,16 +29,14 @@ public class ShiroConfiguration {
 
         // 添加自定义过滤器：这里是认证失败返回 JSON 信息，而非跳转到登录 url
         Map<String, Filter> filterMap = new LinkedHashMap<>();
-        filterMap.put("authc", new NoRedirectFilter());
+        filterMap.put("authc", new CustomFilter());
         shiroFilterFactoryBean.setFilters(filterMap);
 
         // 添加自定义过滤器链
         Map<String, String> filterChainDefinitionMap  = new LinkedHashMap<>();
         filterChainDefinitionMap.put("/login", "anon");
         filterChainDefinitionMap.put("/register", "anon");
-        filterChainDefinitionMap.put("/userinfo", "authc");
-        filterChainDefinitionMap.put("/userupdate", "authc");
-        filterChainDefinitionMap.put("/user/*", "authc");
+        filterChainDefinitionMap.put("/logout", "anon");
         filterChainDefinitionMap.put("/*", "authc");
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
 

@@ -1,133 +1,129 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.louisun.dao.PostDao">
-  <resultMap id="BaseResultMap" type="com.louisun.model.Post">
-    <id column="post_id" jdbcType="INTEGER" property="postId" />
-    <result column="tag_id" jdbcType="INTEGER" property="tagId" />
-    <result column="user_id" jdbcType="INTEGER" property="userId" />
-    <result column="title" jdbcType="VARCHAR" property="title" />
-    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
-    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-  </resultMap>
-  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.louisun.model.Post">
-    <result column="content" jdbcType="LONGVARCHAR" property="content" />
-  </resultMap>
-  <sql id="Base_Column_List">
-    post_id, tag_id, user_id, title, create_time, update_time
-  </sql>
-  <sql id="Blob_Column_List">
-    content
-  </sql>
-  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
-    select 
-    <include refid="Base_Column_List" />
-    ,
-    <include refid="Blob_Column_List" />
-    from post
-    where post_id = #{postId,jdbcType=INTEGER}
-  </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
-    delete from post
-    where post_id = #{postId,jdbcType=INTEGER}
-  </delete>
-  <insert id="insert" parameterType="com.louisun.model.Post">
-    insert into post (post_id, tag_id, user_id, 
-      title, create_time, update_time, 
-      content)
-    values (#{postId,jdbcType=INTEGER}, #{tagId,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER}, 
-      #{title,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{content,jdbcType=LONGVARCHAR})
-  </insert>
-  <insert id="insertSelective" parameterType="com.louisun.model.Post">
-    insert into post
-    <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="postId != null">
-        post_id,
-      </if>
-      <if test="tagId != null">
-        tag_id,
-      </if>
-      <if test="userId != null">
-        user_id,
-      </if>
-      <if test="title != null">
-        title,
-      </if>
-      <if test="createTime != null">
-        create_time,
-      </if>
-      <if test="updateTime != null">
-        update_time,
-      </if>
-      <if test="content != null">
-        content,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="postId != null">
-        #{postId,jdbcType=INTEGER},
-      </if>
-      <if test="tagId != null">
-        #{tagId,jdbcType=INTEGER},
-      </if>
-      <if test="userId != null">
-        #{userId,jdbcType=INTEGER},
-      </if>
-      <if test="title != null">
-        #{title,jdbcType=VARCHAR},
-      </if>
-      <if test="createTime != null">
-        #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="updateTime != null">
-        #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="content != null">
-        #{content,jdbcType=LONGVARCHAR},
-      </if>
-    </trim>
-  </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.louisun.model.Post">
-    update post
-    <set>
-      <if test="tagId != null">
-        tag_id = #{tagId,jdbcType=INTEGER},
-      </if>
-      <if test="userId != null">
-        user_id = #{userId,jdbcType=INTEGER},
-      </if>
-      <if test="title != null">
-        title = #{title,jdbcType=VARCHAR},
-      </if>
-      <if test="createTime != null">
-        create_time = #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="content != null">
-        content = #{content,jdbcType=LONGVARCHAR},
-      </if>
-    </set>
-    where post_id = #{postId,jdbcType=INTEGER}
-  </update>
-  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.louisun.model.Post">
-    update post
-    set tag_id = #{tagId,jdbcType=INTEGER},
-      user_id = #{userId,jdbcType=INTEGER},
-      title = #{title,jdbcType=VARCHAR},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
-      content = #{content,jdbcType=LONGVARCHAR}
-    where post_id = #{postId,jdbcType=INTEGER}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="com.louisun.model.Post">
-    update post
-    set tag_id = #{tagId,jdbcType=INTEGER},
-      user_id = #{userId,jdbcType=INTEGER},
-      title = #{title,jdbcType=VARCHAR},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
-    where post_id = #{postId,jdbcType=INTEGER}
-  </update>
+
+    <resultMap id="PostMap" type="com.louisun.model.Post">
+        <id column="post_id" jdbcType="INTEGER" property="postId"/>
+        <result column="tag_id" jdbcType="INTEGER" property="tagId"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="comment_amount" jdbcType="INTEGER" property="commentAmount"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="content" jdbcType="LONGVARCHAR" property="content"/>
+        <result column="content_md" jdbcType="LONGVARCHAR" property="contentMd"/>
+    </resultMap>
+
+    <resultMap id="PostCommentMap" type="com.louisun.model.Post" extends="PostMap">
+        <collection property="commentList"
+                    fetchType="lazy"
+                    column="{postId=post_id}"
+                    select="com.louisun.dao.CommentDao.selectByPostId"
+        />
+    </resultMap>
+
+    <delete id="deleteByPostId" parameterType="java.lang.Integer">
+        delete
+        from post
+        where post_id = #{postId,jdbcType=INTEGER}
+    </delete>
+
+    <insert id="insertPost" parameterType="com.louisun.model.Post">
+        insert into post (post_id, tag_id, user_id,
+                          title, comment_amount, create_time,
+                          update_time, content, content_md)
+        values (#{postId,jdbcType=INTEGER}, #{tagId,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER},
+                #{title,jdbcType=VARCHAR}, #{commentAmount,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP},
+                #{updateTime,jdbcType=TIMESTAMP}, #{content,jdbcType=LONGVARCHAR}, #{contentMd,jdbcType=LONGVARCHAR})
+    </insert>
+
+
+    <update id="updateByPostId" parameterType="com.louisun.model.Post">
+        update post
+        set tag_id         = #{tagId,jdbcType=INTEGER},
+            user_id        = #{userId,jdbcType=INTEGER},
+            title          = #{title,jdbcType=VARCHAR},
+            comment_amount = #{commentAmount,jdbcType=INTEGER},
+            create_time    = #{createTime,jdbcType=TIMESTAMP},
+            update_time    = #{updateTime,jdbcType=TIMESTAMP},
+            content        = #{content,jdbcType=LONGVARCHAR},
+            content_md     = #{contentMd,jdbcType=LONGVARCHAR}
+        where post_id = #{postId,jdbcType=INTEGER}
+    </update>
+
+    <select id="selectByPostId" parameterType="java.lang.Integer" resultMap="PostMap">
+        select post_id,
+               tag_id,
+               user_id,
+               title,
+               comment_amount,
+               create_time,
+               update_time,
+               content,
+               content_md
+        from post
+        where post_id = #{postId,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectByTagId" parameterType="java.lang.Integer" resultMap="PostMap">
+        select post_id,
+               tag_id,
+               user_id,
+               title,
+               comment_amount,
+               create_time,
+               update_time,
+               content,
+               content_md
+        from post
+        where tag_id = #{tagId,jdbcType=INTEGER}
+        order by create_time desc
+    </select>
+
+
+    <select id="selectByUserId" parameterType="java.lang.Integer" resultMap="PostMap">
+        select post_id,
+               tag_id,
+               user_id,
+               title,
+               comment_amount,
+               create_time,
+               update_time,
+               content,
+               content_md
+        from post
+        where user_id = #{postId,jdbcType=INTEGER}
+        order by update_time desc
+    </select>
+
+    <select id="selectPostWithCommentsByPostId" parameterType="java.lang.Integer" resultMap="PostCommentMap">
+        select post_id,
+               tag_id,
+               user_id,
+               title,
+               comment_amount,
+               create_time,
+               update_time,
+               content,
+               content_md
+        from post
+        where post_id = #{postId,jdbcType=INTEGER}
+    </select>
+
+
+    <select id="selectAllPosts" resultMap="PostMap">
+        select post_id,
+               tag_id,
+               user_id,
+               title,
+               comment_amount,
+               create_time,
+               update_time,
+               content,
+               content_md
+        from post
+        order by create_time desc
+    </select>
+
+
 </mapper>

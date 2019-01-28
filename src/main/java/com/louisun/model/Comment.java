@@ -1,75 +1,40 @@
 package com.louisun.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Date;
 
+@Getter
+@Setter
 public class Comment {
+    /**
+     * 评论 ID
+     */
     private Integer commentId;
 
+    /**
+     * 用户（发评论者） ID
+     */
     private Integer userId;
 
+    /**
+     * 帖子 ID
+     */
     private Integer postId;
 
-    private Integer toUserId;
-
-    private Date createTime;
-
-    private Date updateTime;
-
+    /**
+     * 评论内容
+     */
     private String content;
 
-    public Integer getCommentId() {
-        return commentId;
-    }
+    /**
+     * 回复评论 ID（可为空）
+     */
+    private Integer toCommentId;
 
-    public void setCommentId(Integer commentId) {
-        this.commentId = commentId;
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public Integer getPostId() {
-        return postId;
-    }
-
-    public void setPostId(Integer postId) {
-        this.postId = postId;
-    }
-
-    public Integer getToUserId() {
-        return toUserId;
-    }
-
-    public void setToUserId(Integer toUserId) {
-        this.toUserId = toUserId;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content == null ? null : content.trim();
-    }
+    /**
+     * 评论创建时间
+     */
+    private Date createTime;
 }

@@ -9,6 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
 
 
 @RestController
@@ -17,7 +20,7 @@ public class UserController {
     @Autowired
     private UserService userService = null;
 
-    /** 注册用户 */
+    /** 注册（新增）用户 */
     @PostMapping("/register")
     public JSONObject createUser(@RequestBody User user) {
         SimpleHash simpleHash = new SimpleHash("MD5", user.getPassword(), null, 2);
@@ -28,6 +31,7 @@ public class UserController {
     /** 通过 email 获取用户信息 */
     @GetMapping("/userinfo")
     public JSONObject getUserByEmail(@SessionAttribute("email") String email){
+        log.warn("session email: " + email);
         return userService.getUserBasicInfoByEmail(email);
 
     }
@@ -62,6 +66,20 @@ public class UserController {
         }
         return JsonResult.errorResult(ErrorEnum.E_3004);
     }
+
+    @PostMapping("/static/avatar")
+    public JSONObject uploadAvatar(@SessionAttribute("email") String email, MultipartFile file){
+        log.warn("session email: " + email);
+        File dest = new File(email+".jpg");
+        try{
+            file.transferTo(dest);
+        } catch (Exception e){
+            e.printStackTrace();
+            return JsonResult.errorResult(ErrorEnum.E_3004);
+        }
+        return JsonResult.successResult("上传成功");
+    }
+
 
     /** 通过 id 获取用户信息 */
     @GetMapping("/user/{id}")

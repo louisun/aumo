@@ -30,11 +30,4 @@ public interface LoginService {
      **/
     JSONObject getInfo();
 
-    /**
-     * 退出登录
-     * @param
-     * @return
-     * @Date 2018-12-26
-     **/
-    JSONObject logout();
 }

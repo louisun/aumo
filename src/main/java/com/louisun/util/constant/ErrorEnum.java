@@ -5,8 +5,8 @@ import com.alibaba.druid.wall.violation.ErrorCode;
 public enum ErrorEnum {
     E_1001("1001", "创建用户失败"),
     E_1002("1002", "用户已存在"),
-
     E_1003("1003", "用户不存在"),
+    E_1004("1004", "登出失败"),
 
     E_2001("2001", "登录失败"),
 

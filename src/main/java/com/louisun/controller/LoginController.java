@@ -16,6 +16,7 @@ public class LoginController {
     @Autowired
     private LoginService loginService;
 
+    /** 登录 */
     @PostMapping("/login")
     public JSONObject login(@RequestBody JSONObject requestJson, HttpSession session){
         JSONObject jsonResult =  loginService.authLogin(requestJson);

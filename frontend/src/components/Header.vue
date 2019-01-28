@@ -21,11 +21,36 @@
 </template>
 
 
-<<script>
+<script>
+import {requestLogout} from "../api/api";
+
 export default {
     methods: {
         handleCommand(command){
+          if(command == "logout"){
+            requestLogout().then(data => {
+              let code = data.returnCode;
+              let msg = data.returnMsg;
+              let returnData = data.returnData;
+              if (code !== "200") {
+                this.$message({
+                  message: msg,
+                  type: "error"
+                });
+              } else {
+                this.$router.push({ path: "/login" });
+                this.$message({
+                  message: "已退出登录",
+                  type: "success"
+                });
+
+              }
+            })
+
+          }
+          else{
             this.$message('click on item ' + command);
+          }
         }
         
     }

@@ -1,23 +1,35 @@
 package com.louisun.dao;
 
 import com.louisun.model.Comment;
-import org.apache.ibatis.annotations.Mapper;
-import org.springframework.stereotype.Repository;
+import org.apache.ibatis.annotations.Param;
 
-@Mapper
-@Repository
+import java.util.List;
+
 public interface CommentDao {
-    int deleteByPrimaryKey(Integer commentId);
+    /**
+     * 删除评论
+     */
+    int deleteByCommentId(Integer commentId);
 
-    int insert(Comment record);
+    /**
+     * 创建评论
+     */
+    int insertComment(Comment comment);
 
-    int insertSelective(Comment record);
+    /**
+     * 根据评论 ID 查询评论
+     */
+    Comment selectByCommentId(Integer commentId);
 
-    Comment selectByPrimaryKey(Integer commentId);
 
-    int updateByPrimaryKeySelective(Comment record);
+    /**
+     * 根据帖子 ID 查询评论列表（根据发布时间正序）
+     */
+    List<Comment> selectByPostId(@Param("postId") Integer postId);
 
-    int updateByPrimaryKeyWithBLOBs(Comment record);
+    /**
+     * 根据用户 ID 查询评论（根据发布时间倒序）
+     */
+    List<Comment> selectByUserId(Integer userId);
 
-    int updateByPrimaryKey(Comment record);
 }

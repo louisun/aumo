@@ -6,6 +6,7 @@ import com.louisun.model.User;
 import com.louisun.service.LoginService;
 import com.louisun.util.JsonResult;
 import com.louisun.util.constant.ErrorEnum;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -15,7 +16,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.xml.transform.Result;
+
 @Service
+@Slf4j
 public class LoginServiceImpl implements LoginService {
     private Logger logger = LoggerFactory.getLogger(LoginServiceImpl.class);
 
@@ -55,8 +59,4 @@ public class LoginServiceImpl implements LoginService {
         return null;
     }
 
-    @Override
-    public JSONObject logout() {
-        return null;
-    }
 }

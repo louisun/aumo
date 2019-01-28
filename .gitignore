@@ -156,3 +156,10 @@ typings/
 .dynamodb/
 frontend/src/utils/
 src/test/
+
+
+
+# Custom
+application.yaml
+generatorconfig.xml
+/resources/

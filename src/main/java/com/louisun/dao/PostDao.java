@@ -1,23 +1,53 @@
 package com.louisun.dao;
 
 import com.louisun.model.Post;
-import org.apache.ibatis.annotations.Mapper;
-import org.springframework.stereotype.Repository;
+import java.util.List;
 
-@Mapper
-@Repository
+/**
+ * 说明：
+ * 查询帖子时在，只有在详情页面，Post中才会存入评论列表，即 selectPostWithCommentsByPostId
+ * 其余查询帖子（或列表），都是无 commentList 的 Post
+ */
 public interface PostDao {
-    int deleteByPrimaryKey(Integer postId);
 
-    int insert(Post record);
+    /**
+     * 删除帖子
+     */
+    int deleteByPostId(Integer postId);
 
-    int insertSelective(Post record);
+    /**
+     * 插入帖子
+     */
+    int insertPost(Post post);
 
-    Post selectByPrimaryKey(Integer postId);
+    /**
+     * 通过帖子 ID 更新帖子
+     */
+    int updateByPostId(Post post);
 
-    int updateByPrimaryKeySelective(Post record);
+    /**
+     * 通过帖子 ID 查找帖子基本信息
+     */
+    Post selectByPostId(Integer postId);
 
-    int updateByPrimaryKeyWithBLOBs(Post record);
+    /**
+     * 通过帖子 ID 查找帖子信息，包含 Comment 列表
+     */
+    Post selectPostWithCommentsByPostId(Integer postId);
 
-    int updateByPrimaryKey(Post record);
+    /**
+     * 查询所有帖子（根据发布时间倒序）
+     */
+    List<Post> selectAllPosts();
+
+
+    /**
+     * 通过版块 ID 查找帖子（根据发布时间倒序）
+     */
+    List<Post> selectByTagId(Integer tagId);
+
+    /**
+     * 通过用户 ID 查找帖子（根据更新时间倒序）
+     */
+    List<Post> selectByUserId(Integer userId);
 }

@@ -17,43 +17,62 @@ import java.util.List;
 @Service
 public class TagServiceImpl implements TagService {
 
+    private final TagDao tagDao;
+
     @Autowired
-    private TagDao tagDao=null;
-    /*
-     * 返回目前数据库中的所有的tag的名称，用于前端的展示
-     * @param
-     * @return com.alibaba.fastjson.JSONObject
-     * @date 2019/1/28 16:51
+    public TagServiceImpl(TagDao tagDao) {
+        this.tagDao = tagDao;
+    }
+
+    /**
+     * 获取所有版块
+     * @param null
+     * @return JSONObject
+     * @author YeJianan
+     * @date 2019/1/28 16:10
      */
     @Override
-    public JSONObject getAllTags(){
-        JSONObject jsonResult = new JSONObject();
-        List<Tag> tags=tagDao.selectAlltag();
-        List<String> tags_name=new ArrayList<String>();
-
-        if(tags!=null) {
-            for (Tag a : tags) {
-                tags_name.add(a.getName());
-            }
-            jsonResult.put("tagsName", tags_name);
-            return JsonResult.successResult(jsonResult);
+    public JSONObject getAllTags() {
+        List<Tag> tags = tagDao.selectAllTags();
+        if (tags != null){
+            return JsonResult.successResult(tags);
         }
-        else
-            return JsonResult.errorResult(ErrorEnum.E_4001);
+        else{
+            return JsonResult.errorResult(ErrorEnum.E_5002);
+        }
     }
 
+
+    /**
+     * 插入新版块
+     * @param tag 版块
+     * @return JSONObject
+     * @author YeJianan
+     * @date 2019/1/28 20:18
+     */
     @Override
-    public String getTagById(int tag_id){
-        Tag res=tagDao.selectByPrimaryKey(tag_id);
-        return res.getName();
+    public JSONObject getTagById(int tagId) {
+        Tag tag = tagDao.selectByTagId(tagId);
+        if (tag == null) {
+            return JsonResult.errorResult(ErrorEnum.E_5002);
+        } else {
+            return JsonResult.successResult(tag);
+        }
     }
 
-    public JSONObject insertTag(String name){
-        if(tagDao.insert(name)==0){
-            return JsonResult.errorResult(ErrorEnum.E_4002);
-        }
-        else {
-            return JsonResult.successResult(SuccessEnum.S_200);
+    /**
+     * 表示插入一个新的tag
+     * @param tag 版块
+     * @return JSONObject
+     * @author YeJianan
+     * @date 2019/1/28 20:18
+     */
+    @Override
+    public JSONObject insertTag(Tag tag) {
+        if (tagDao.insertTag(tag) == 0) {
+            return JsonResult.errorResult(ErrorEnum.E_5001);
+        } else {
+            return JsonResult.successResult("添加版块成功");
         }
     }
 

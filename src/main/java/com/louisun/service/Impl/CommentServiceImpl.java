@@ -9,52 +9,82 @@ import com.louisun.util.constant.ErrorEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Time;
-import java.util.Date;
 import java.util.List;
 
 @Service
 public class CommentServiceImpl implements CommentService {
 
-    @Autowired
-    private CommentDao commentdao=null;
+    private final CommentDao commentDao;
 
+    @Autowired
+    public CommentServiceImpl(CommentDao commentDao) {
+        this.commentDao = commentDao;
+    }
+
+    /**
+     * 添加关于某篇文章的一条评论
+     * @param comment 评论
+     * @return JSONObject
+     * @author YeJianan
+     * @date 2019/1/28 16:00
+     */
     @Override
     public JSONObject insertComment(Comment comment){
-        if(commentdao.insertComment(comment)==0){
-            return  JsonResult.errorResult(ErrorEnum.E_5001);
+        if(commentDao.insertComment(comment)==0){
+            return  JsonResult.errorResult(ErrorEnum.E_6001);
         }
         else{
             return JsonResult.successResult(comment);
         }
     }
 
+    /**
+     * 根据帖子的id获取所有评论
+     * @param postId 帖子 id
+     * @return JSONObject
+     * @author YeJianan
+     * @date 2019/1/28 16:01
+     */
     @Override
-    public JSONObject getCommentByPostId(int post_id){
-        List<Comment> commentList=commentdao.selectByPostId(post_id);
+    public JSONObject getCommentByPostId(int postId){
+        List<Comment> commentList= commentDao.selectByPostId(postId);
         if(commentList==null){
-            return JsonResult.errorResult(ErrorEnum.E_5002);
+            return JsonResult.errorResult(ErrorEnum.E_6002);
         }
         else{
             return JsonResult.successResult(commentList);
         }
     }
 
+    /**
+     * 根据用户id获取该用户提交的所有评论（按时间逆序）
+     * @param userId 用户 id
+     * @return JSONObject
+     * @author YeJianan
+     * @date 2019/1/28 16:02
+     */
     @Override
-    public JSONObject getCommentByUserId(int user_id){
-        List<Comment> commentList=commentdao.selectByUserId(user_id);
+    public JSONObject getCommentByUserId(int userId){
+        List<Comment> commentList= commentDao.selectByUserId(userId);
         if(commentList==null){
-            return JsonResult.errorResult(ErrorEnum.E_5003);
+            return JsonResult.errorResult(ErrorEnum.E_6002);
         }
         else{
             return JsonResult.successResult(commentList);
         }
     }
 
+    /**
+     * 根据评论id删除评论
+     * @param commentId 评论 id
+     * @return JSONObject
+     * @author YeJianan
+     * @date 2019/1/28 16:07
+     */
     @Override
-    public JSONObject deleteCommentByCommentId(int comment_id){
-        if(commentdao.deleteByCommentId(comment_id)==0){
-            return JsonResult.errorResult(ErrorEnum.E_5004);
+    public JSONObject deleteCommentByCommentId(int commentId){
+        if(commentDao.deleteByCommentId(commentId)==0){
+            return JsonResult.errorResult(ErrorEnum.E_6003);
         }
         else{
             return JsonResult.successResult();

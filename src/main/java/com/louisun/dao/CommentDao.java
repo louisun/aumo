@@ -25,7 +25,6 @@ public interface CommentDao {
      */
     Comment selectByCommentId(Integer commentId);
 
-
     /**
      * 根据帖子 ID 查询评论列表（根据发布时间正序）
      */
@@ -35,6 +34,4 @@ public interface CommentDao {
      * 根据用户 ID 查询评论（根据发布时间倒序）
      */
     List<Comment> selectByUserId(Integer userId);
-
-
 }

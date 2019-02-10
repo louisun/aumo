@@ -15,7 +15,8 @@ import java.io.PrintWriter;
 
 public class CustomFilter extends UserFilter {
     /**
-     * 在访问过来的时候检测是否为OPTIONS请求，如果是就直接返回true
+     * 使用了Shiro 框架，前端请求有 2 次，第一次为 Options 不带 cookie，会被拦截失效，无法完成第二次请求
+     * 允许所有 OPTIONS 请求通过
      */
     @Override
     protected boolean preHandle(ServletRequest request, ServletResponse response) throws Exception {
@@ -30,7 +31,7 @@ public class CustomFilter extends UserFilter {
 
 
     /**
-     * 为response设置header，实现跨域
+     * 工具函数，为上述 Options 请求的响应头设置header，实现跨域
      */
     private void setHeader(HttpServletRequest request,HttpServletResponse response){
         //跨域的header设置

@@ -1,69 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.louisun.dao.TagDao">
-    <resultMap id="BaseResultMap" type="com.louisun.model.Tag">
+
+    <resultMap id="TagMap" type="com.louisun.model.Tag">
         <id column="tag_id" jdbcType="INTEGER" property="tagId"/>
         <result column="name" jdbcType="VARCHAR" property="name"/>
     </resultMap>
 
-    <sql id="Base_Column_List">
-        tag_id,
-        name
-    </sql>
-    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-        select
-        <include refid="Base_Column_List"/>
+
+    <select id="selectByTagId" parameterType="java.lang.Integer" resultMap="TagMap">
+        select tag_id, name
         from tag
         where tag_id = #{tagId,jdbcType=INTEGER}
     </select>
 
-    <select id="selectAlltag" resultMap="BaseResultMap">
-        select
-        <include refid="Base_Column_List"/>
+    <select id="selectAllTags" resultMap="TagMap">
+        select tag_id, name
         from tag
     </select>
 
 
-    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    <delete id="deleteByTagId" parameterType="java.lang.Integer">
         delete
         from tag
         where tag_id = #{tagId,jdbcType=INTEGER}
     </delete>
-    <insert id="insert" parameterType="java.lang.String">
-        insert into tag(name)
-        values (#{name,jdbcType=VARCHAR})
-    </insert>
-    <insert id="insertSelective" parameterType="com.louisun.model.Tag">
+
+    <insert id="insertTag" parameterType="com.louisun.model.Tag">
         insert into tag
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="tagId != null">
-                tag_id,
-            </if>
             <if test="name != null">
                 name,
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="tagId != null">
-                #{tagId,jdbcType=INTEGER},
-            </if>
             <if test="name != null">
                 #{name,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="com.louisun.model.Tag">
+
+    <update id="updateByTagId" parameterType="com.louisun.model.Tag">
         update tag
         <set>
             <if test="name != null">
                 name = #{name,jdbcType=VARCHAR},
             </if>
         </set>
-        where tag_id = #{tagId,jdbcType=INTEGER}
-    </update>
-    <update id="updateByPrimaryKey" parameterType="com.louisun.model.Tag">
-        update tag
-        set name = #{name,jdbcType=VARCHAR}
         where tag_id = #{tagId,jdbcType=INTEGER}
     </update>
 </mapper>

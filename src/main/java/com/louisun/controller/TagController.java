@@ -1,6 +1,7 @@
 package com.louisun.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.louisun.model.Tag;
 import com.louisun.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -8,19 +9,32 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class TagController {
 
-    @Autowired
-    private TagService tagService=null;
+    private final TagService tagService;
 
-    /** 获得所有的tag名 **/
-    @GetMapping("/getTags")
-    public JSONObject getAllTags(){
-        return tagService.getAllTags();
+    @Autowired
+    public TagController(TagService tagService) {
+        this.tagService = tagService;
     }
 
-    /** 插入一个tag **/
-    @PostMapping("/insertTag")
-    public JSONObject insertTags(@RequestBody JSONObject requestBody){
-        String tagName=requestBody.getString("tagname");
-        return tagService.insertTag(tagName);
+    /**
+     * 获取所有标签
+     *
+     * @param null
+     * @return JSONObject
+     */
+    @GetMapping("/tags")
+    public JSONObject getTags() {
+        return tagService.getAllTags();
+
+    }
+
+    /**
+     * 添加版块 /tag POST
+     * @param tag 请求体转换的 Tag 对象，包含：版块名
+     * @return JSONObject
+     */
+    @PostMapping("/tag")
+    public JSONObject addTag(@RequestBody Tag tag) {
+        return tagService.insertTag(tag);
     }
 }

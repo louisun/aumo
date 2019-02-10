@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.louisun.model.Comment;
 import com.louisun.service.CommentService;
 import com.louisun.util.JsonResult;
+import com.louisun.util.constant.ErrorEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,46 +13,58 @@ import java.util.Date;
 @RestController
 public class CommentController {
 
-    @Autowired
-    private CommentService commentService=null;
+    private final CommentService commentService;
 
-    /** 对具体的某篇文章添加评论 **/
-    @PostMapping("/addComment")
-    public JSONObject addComment(@RequestBody JSONObject requestBody){
-        Comment comment=new Comment();
-        int user_id=Integer.valueOf(requestBody.get("user_id").toString());
-        int post_id=Integer.valueOf(requestBody.get("post_id").toString());
-        String content=requestBody.get("content").toString();
-        int to_comment_id=0;
-        if(requestBody.containsKey("to_comment_id")) {
-            to_comment_id = Integer.valueOf(requestBody.get("to_comment_id").toString());
-            comment.setToCommentId(to_comment_id);
-        }
-        comment.setUserId(user_id);
-        comment.setPostId(post_id);
-        comment.setContent(content);
+    @Autowired
+    public CommentController(CommentService commentService) {
+        this.commentService = commentService;
+    }
+
+    /**
+     * 在帖子下添加评论 /post/{postId}/comment POST
+     * @param comment 请求体转换的 Comment 对象：包含帖子id，用户id，回复id，评论内容
+     * @return  JSONObject
+     */
+    @PostMapping("/post/{postId}/comment")
+    public JSONObject addComment(@RequestBody Comment comment, @PathVariable("postId") Integer postId){
+        comment.setPostId(postId);
         return commentService.insertComment(comment);
     }
 
-    /** 查询某篇文章的全部评论 **/
-    @GetMapping("/getComment")
-    public JSONObject getComment(@RequestBody JSONObject requestBody){
-        int post_id=Integer.valueOf(requestBody.get("postId").toString());
-        System.out.println(post_id);
-        return commentService.getCommentByPostId(post_id);
+    /**
+     * 获取帖子下的所有评论 /post/{postId}/comments/ GET
+     * @param postId 帖子id
+     * @return  JSONObject
+     */
+    @GetMapping("/post/{postId}/comments")
+    public JSONObject getCommentsByPostId(@PathVariable("postId") Integer postId){
+        return commentService.getCommentByPostId(postId);
     }
 
-    /** 查询某个用户的所有评论 **/
-    @GetMapping("/getUserComment")
-    public  JSONObject getUserComment(@RequestBody JSONObject requestBody){
-        int user_id=Integer.valueOf(requestBody.get("userId").toString());
-        return commentService.getCommentByUserId(user_id);
+    /**
+     * 获取某用户的所有评论 /post/{postId}/comments/ GET
+     * @param userId 用户id
+     * @return  JSONObject
+     */
+    @GetMapping("/user/{userId}/comments")
+    public  JSONObject getCommentsByUserId(@PathVariable("userId") Integer userId){
+        return commentService.getCommentByUserId(userId);
     }
 
-    /** 删除某个用户的评论 **/
-    @GetMapping("/deleteComment")
-    public JSONObject deleteComment(@RequestBody JSONObject requestBody){
-        int comment_id=Integer.valueOf(requestBody.get("commentId").toString());
-        return commentService.deleteCommentByCommentId(comment_id);
+    /**
+     * 删除当前用户的某条评论 /post/{postId}/comments/ DELETE
+     * @param currentUserId 当前 session 中保存的用户id
+     * @param userId 用户id
+     * @param commentId 帖子id
+     * @return  JSONObject
+     */
+    @DeleteMapping("/user/{userId}/comment/{commentId}")
+    public JSONObject deleteComment(@SessionAttribute("userId") Integer currentUserId, @PathVariable("userId") Integer userId, @PathVariable("commentId") Integer commentId){
+        if(currentUserId == userId){
+            return commentService.deleteCommentByCommentId(commentId);
+        }
+        else{
+            return JsonResult.errorResult(ErrorEnum.E_6003); // 不能删除其他用户的评论
+        }
     }
 }

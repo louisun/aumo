@@ -11,6 +11,11 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class LogoutServiceImpl implements LogoutService {
+    /**
+     * 退出登录
+     * @param null
+     * @return JSONObject
+     */
     @Override
     public JSONObject logout() {
         Subject currentUser = SecurityUtils.getSubject();

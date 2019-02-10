@@ -16,7 +16,12 @@ public class LogoutController {
     @Autowired
     private LogoutService logoutService;
 
-    /** 登出 */
+
+    /**
+     * 退出登录 /logout POST
+     * @param null
+     * @return JSONObject
+     */
     @PostMapping("/logout")
     public JSONObject logout(){
         return logoutService.logout();

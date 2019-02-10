@@ -11,22 +11,26 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import javax.xml.transform.Result;
 
 @Service
 @Slf4j
 public class LoginServiceImpl implements LoginService {
-    private Logger logger = LoggerFactory.getLogger(LoginServiceImpl.class);
+    private final UserDao userdao;
 
     @Autowired
-    private UserDao userdao;
+    public LoginServiceImpl(UserDao userdao) {
+        this.userdao = userdao;
+    }
 
 
+    /**
+     * 验证登录
+     * @param jsonObject 登录信息
+     * @return JSONObject
+     * @date 2018-12-26
+     **/
     @Override
     public JSONObject authLogin(JSONObject jsonObject) {
         String email = jsonObject.getString("email");
@@ -34,29 +38,37 @@ public class LoginServiceImpl implements LoginService {
         Subject currentUser = SecurityUtils.getSubject();
         UsernamePasswordToken token = new UsernamePasswordToken(email, password);
         try {
+            // 尝试用上面 token 登录，失败则抛出认证异常
             currentUser.login(token);
-            // 获取用户信息
-            User user = userdao.selectUserByEmail(email);
-            JSONObject jsonResult = new JSONObject();
-            jsonResult.put("email", user.getEmail());
-            jsonResult.put("nickname", user.getNickname());
-            jsonResult.put("moto", user.getMoto());
-            jsonResult.put("avatar_path", user.getAvatarPath());
 
-            return JsonResult.successResult(jsonResult);
+            // 认证成功，获取用户基本信息返回
+            User user = userdao.selectUserByEmail(email);
+            return getBasicUserInfo(user);
         } catch (AuthenticationException e) {
+            // 登录失败异常
             return JsonResult.errorResult(ErrorEnum.E_2001);
         }
     }
 
+    private JSONObject getBasicUserInfo(User user) {
+        JSONObject jsonResult = new JSONObject();
+        jsonResult.put("user_id", user.getUserId());
+        jsonResult.put("email", user.getEmail());
+        jsonResult.put("nickname", user.getNickname());
+        jsonResult.put("moto", user.getMoto());
+        jsonResult.put("avatar_path", user.getAvatarPath());
+
+        return JsonResult.successResult(jsonResult);
+    }
+
+    /**
+     * 根据用户名和密码查询对应的用户
+     * @param email 邮箱
+     * @return User
+     * @date 2018-12-26
+     **/
     @Override
     public User getUser(String email) {
         return userdao.selectUserByEmail(email);
     }
-
-    @Override
-    public JSONObject getInfo() {
-        return null;
-    }
-
 }

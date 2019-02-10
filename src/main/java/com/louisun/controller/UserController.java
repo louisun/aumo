@@ -5,6 +5,7 @@ import com.louisun.model.User;
 import com.louisun.service.UserService;
 import com.louisun.util.JsonResult;
 import com.louisun.util.constant.ErrorEnum;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,53 +13,83 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
 
 
 @RestController
 @Slf4j
 public class UserController {
-    @Autowired
-    private UserService userService = null;
+    private final UserService userService;
 
-    /** 注册（新增）用户 */
-    @PostMapping("/register")
-    public JSONObject createUser(@RequestBody User user) {
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    /**
+     * 注册用户 /user POST
+     * @param user 请求体转换的User对象：包含邮箱、密码、昵称
+     * @return JSONObject
+     */
+    @ApiOperation(value="创建用户" ,notes="根据User对象创建用户")
+    @PostMapping("/user")
+    public JSONObject addUser(@RequestBody User user) {
         SimpleHash simpleHash = new SimpleHash("MD5", user.getPassword(), null, 2);
         user.setPassword(simpleHash.toHex());
         return userService.insertUser(user);
     }
 
-    /** 通过 email 获取用户信息 */
-    @GetMapping("/userinfo")
-    public JSONObject getUserByEmail(@SessionAttribute("email") String email){
-        log.warn("session email: " + email);
-        return userService.getUserBasicInfoByEmail(email);
-
+    /**
+     * 根据用户id获取用户信息 /user/{id} GET
+     * @param userId 用户 id
+     * @return JSONObject
+     */
+    @ApiOperation(value="获取用户信息", notes="根据用户id获取用户信息")
+    @GetMapping("/user/{id}")
+    public JSONObject getUser(@PathVariable("id") int userId){
+        return userService.getUserById(userId);
     }
 
-    /** 更新用户信息：基本信息、密码 */
-    @PostMapping("/userupdate")
-    public JSONObject updateUser(@RequestBody JSONObject requestBody) {
+    /**
+     * 获取当前用户的信息 /user GET
+     * @param userId 当前 session 中保存的用户id
+     * @return JSONObject
+     */
+    @GetMapping("/user")
+    public JSONObject getCurrentUser(@SessionAttribute("userId") int userId){
+        return userService.getUserById(userId);
+    }
+
+
+    /**
+     * 更新当前用户的部分信息
+     * @param userId 当前 session 中保存的用户id
+     * @param updateRequest 请求更新的信息
+     * @param type 更新类型: basic（昵称、个性签名），password（密码）
+     * @return JSONObject
+     */
+    @PatchMapping("/user")
+    public JSONObject updateUser(@SessionAttribute("userId") int userId, @RequestBody JSONObject updateRequest, @RequestParam(value="type") String type) {
 
         User user = new User();
-        if(requestBody.getString("type").equals("userInfo")){
-            user.setEmail(requestBody.getString("email"));
-            user.setNickname(requestBody.getString("nickname"));
-            user.setMoto(requestBody.getString("moto"));
-            return userService.updateUserByEmail(user);
-
+        user.setUserId(userId);
+        if(type.equals("basic")){
+            // 修改昵称和个性签名
+            user.setNickname(updateRequest.getString("nickname"));
+            user.setMoto(updateRequest.getString("moto"));
+            return userService.updateUserById(user);
         }
-        else if(requestBody.getString("type").equals("userPassword")){
-            JSONObject result = userService.getUserByEmail(requestBody.getString("email"));
-            if(result.getString("returnCode").equals("200")){
-                User u = (User) result.get("returnData");
-                SimpleHash simpleHash1 = new SimpleHash("MD5", requestBody.getString("currentPassword"), null, 2);
-                // 旧密码匹配，设置新密码
+        else if(type.equals("password")){
+            // 修改密码：要先匹配旧密码，匹配成功才能设置新密码
+            JSONObject userResult = userService.getUserById(userId);
+            if(userResult.getString("returnCode").equals("200")){
+                User u = (User) userResult.get("returnData");
+                SimpleHash simpleHash1 = new SimpleHash("MD5", updateRequest.getString("currentPassword"), null, 2);
+                // 旧密码匹配成功，设置新密码
                 if(u.getPassword().equals(simpleHash1.toHex())){
-                    SimpleHash simpleHash2 = new SimpleHash("MD5", requestBody.getString("newPassword"), null, 2);
-                    user.setEmail(requestBody.getString("email"));
+                    SimpleHash simpleHash2 = new SimpleHash("MD5", updateRequest.getString("newPassword"), null, 2);
                     user.setPassword(simpleHash2.toHex());
-                    return userService.updateUserByEmail(user);
+                    return userService.updateUserById(user);
                 } else return JsonResult.errorResult(ErrorEnum.E_3003);
 
             }
@@ -67,33 +98,21 @@ public class UserController {
         return JsonResult.errorResult(ErrorEnum.E_3004);
     }
 
-    @PostMapping("/static/avatar")
-    public JSONObject uploadAvatar(@SessionAttribute("email") String email, MultipartFile file){
-        log.warn("session email: " + email);
-        File dest = new File(email+".jpg");
+    /**
+     * 设置当前用户头像
+     * @param userId 当前 session 中保存的用户id
+     * @param uploadPicture 用户上传的图片
+     * @return JSONObject
+     */
+    @PostMapping("/avatar")
+    public JSONObject uploadAvatar(@SessionAttribute("userId") int userId, MultipartFile uploadPicture){
+        File dest = new File(userId+".jpg");
         try{
-            file.transferTo(dest);
-        } catch (Exception e){
+            uploadPicture.transferTo(dest);
+        } catch (IOException e){
             e.printStackTrace();
-            return JsonResult.errorResult(ErrorEnum.E_3004);
+            return JsonResult.errorResult(ErrorEnum.E_3002);
         }
         return JsonResult.successResult("上传成功");
     }
-
-
-    /** 通过 id 获取用户信息 */
-    @GetMapping("/user/{id}")
-    public JSONObject getUserById(@PathVariable("id") int id) {
-        return userService.getUserById(id);
-    }
-
-
-    /** 通过 id 删除用户 */
-    @PostMapping("/user/{id}")
-    public JSONObject deleteUser(@PathVariable("id") int id) {
-        return userService.deleteUserById(id);
-    }
-
-
-
 }

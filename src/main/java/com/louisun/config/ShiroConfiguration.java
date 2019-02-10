@@ -34,10 +34,11 @@ public class ShiroConfiguration {
 
         // 添加自定义过滤器链
         Map<String, String> filterChainDefinitionMap  = new LinkedHashMap<>();
-        filterChainDefinitionMap.put("/login", "anon");
-        filterChainDefinitionMap.put("/register", "anon");
-        filterChainDefinitionMap.put("/logout", "anon");
-        filterChainDefinitionMap.put("/*", "authc");
+        filterChainDefinitionMap.put("/*", "anon");
+//        filterChainDefinitionMap.put("/login", "anon");
+//        filterChainDefinitionMap.put("/register", "anon");
+//        filterChainDefinitionMap.put("/logout", "anon");
+//        filterChainDefinitionMap.put("/*", "authc");
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
 
         return shiroFilterFactoryBean;

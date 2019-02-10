@@ -30,11 +30,11 @@
 
     <insert id="insertPost" parameterType="com.louisun.model.Post">
         insert into post (post_id, tag_id, user_id,
-                          title, comment_amount, create_time,
-                          update_time, content, content_md)
+                          title, comment_amount,
+                          content, content_md)
         values (#{postId,jdbcType=INTEGER}, #{tagId,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER},
-                #{title,jdbcType=VARCHAR}, #{commentAmount,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP},
-                #{updateTime,jdbcType=TIMESTAMP}, #{content,jdbcType=LONGVARCHAR}, #{contentMd,jdbcType=LONGVARCHAR})
+                #{title,jdbcType=VARCHAR}, #{commentAmount,jdbcType=INTEGER},
+                #{content,jdbcType=LONGVARCHAR}, #{contentMd,jdbcType=LONGVARCHAR})
     </insert>
 
 

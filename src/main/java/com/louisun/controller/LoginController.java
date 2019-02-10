@@ -10,20 +10,30 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 import javax.servlet.http.HttpSession;
 
+
 @RestController
 @SessionAttributes(names = {"email"})
 public class LoginController {
-    @Autowired
-    private LoginService loginService;
+    private final LoginService loginService;
 
-    /** 登录 */
+    @Autowired
+    public LoginController(LoginService loginService) {
+        this.loginService = loginService;
+    }
+
+    /**
+     * 登录 /login POST
+     * @param loginRequest 登录信息：邮箱、密码
+     * @param session 会话（存放用户邮箱名）
+     * @return JSONObject 登录失败信息 or 用户基本信息
+     */
     @PostMapping("/login")
-    public JSONObject login(@RequestBody JSONObject requestJson, HttpSession session){
-        JSONObject jsonResult =  loginService.authLogin(requestJson);
+    public JSONObject login(@RequestBody JSONObject loginRequest, HttpSession session){
+        JSONObject loginResponse =  loginService.authLogin(loginRequest);
         // 若登录成功，在 Session 中保存用户邮箱
-        if(jsonResult.getString("returnCode").equals("200")){
-            session.setAttribute("email", requestJson.getString("email"));
+        if(loginResponse.getString("returnCode").equals("200")){
+            session.setAttribute("email", loginRequest.getString("email"));
         }
-        return jsonResult;
+        return loginResponse;
     }
 }

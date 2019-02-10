@@ -1,35 +1,33 @@
 package com.louisun.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.louisun.model.Tag;
 
 public interface TagService {
-
-    /*
-     * 获取目前的网站中存在的所有tag
-     * @param
-     * @return com.alibaba.fastjson.JSONObject
+    /**
+     * 获取所有版块
+     * @param null
+     * @return JSONObject
      * @author YeJianan
      * @date 2019/1/28 16:10
      */
-    public JSONObject getAllTags();
+    JSONObject getAllTags();
 
-    /*
-     * 根据tag_id来获取这个tag的名字
-     * @param tag_id
-     * @return java.lang.String
+    /**
+     * 根据tagId获取版块名
+     * @param tagId 版块 id
+     * @return JSONObject
      * @author YeJianan
      * @date 2019/1/28 16:10
      */
-    public String getTagById(int tag_id);
+    JSONObject getTagById(int tagId);
 
-    /*
-     * 表示插入一个新的tag
-     * @param name
-     * @return com.alibaba.fastjson.JSONObject
+    /**
+     * 插入新的版块
+     * @param tag 版块
+     * @return JSONObject
      * @author YeJianan
      * @date 2019/1/28 20:18
      */
-    public JSONObject insertTag(String name);
-
-
+    JSONObject insertTag(Tag tag);
 }

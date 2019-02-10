@@ -9,17 +9,13 @@ import java.util.List;
 @Mapper
 @Repository
 public interface TagDao {
-    int deleteByPrimaryKey(Integer tagId);
+    int deleteByTagId(Integer tagId);
 
-    int insert(String tag_name);
+    int insertTag(Tag record);
 
-    int insertSelective(Tag record);
+    Tag selectByTagId(Integer tagId);
 
-    Tag selectByPrimaryKey(Integer tagId);
+    List<Tag> selectAllTags();
 
-    int updateByPrimaryKeySelective(Tag record);
-
-    List<Tag> selectAlltag();
-
-    int updateByPrimaryKey(Tag record);
+    int updateByTagId(Tag record);
 }

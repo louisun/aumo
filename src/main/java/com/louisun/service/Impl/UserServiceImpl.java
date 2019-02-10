@@ -11,47 +11,55 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class UserServiceImpl implements UserService {
-    @Autowired
-    private UserDao userMapper = null;
+    private final UserDao userDao;
 
-    @Override
-    public JSONObject getUserById(int id) {
-        User user = userMapper.selectUserById(id);
-        if(user!=null) return JsonResult.successResult(user);
-        else return JsonResult.errorResult(ErrorEnum.E_1003); // 用户不存在
+    @Autowired
+    public UserServiceImpl(UserDao userDao) {
+        this.userDao = userDao;
     }
 
+    /**
+     * 根据用户id得到用户对象
+     * @param id  用户id
+     * @return JSONObject
+     */
     @Override
-    public JSONObject getUserByEmail(String email) {
-        User user = userMapper.selectUserByEmail(email);
+    public JSONObject getUserById(int id) {
+        User user = userDao.selectUserById(id);
         if(user!=null){
             return JsonResult.successResult(user);
         }
         else return JsonResult.errorResult(ErrorEnum.E_1003); // 用户不存在
     }
 
+    /**
+     * 根据用户邮箱更新用户信息
+     * @param email 邮箱名
+     * @return JSONObject
+     */
     @Override
-    public JSONObject getUserBasicInfoByEmail(String email) {
-        User user = userMapper.selectUserByEmail(email);
+    public JSONObject getUserByEmail(String email) {
+        User user = userDao.selectUserByEmail(email);
         if(user!=null){
-            JSONObject jsonResult = new JSONObject();
-            jsonResult.put("email", user.getEmail());
-            jsonResult.put("nickname", user.getNickname());
-            jsonResult.put("moto", user.getMoto());
-            jsonResult.put("avatar_path", user.getAvatarPath());
-            return JsonResult.successResult(jsonResult);
+            return JsonResult.successResult(user);
         }
         else return JsonResult.errorResult(ErrorEnum.E_1003); // 用户不存在
     }
 
+
+    /**
+     * 新增用户
+     * @param user 用户对象
+     * @return JSONObject
+     */
     @Override
     public JSONObject insertUser(User user) {
-        if (userMapper.selectUserByEmail(user.getEmail()) != null) {
+        if (userDao.selectUserByEmail(user.getEmail()) != null) {
             // 用户已存在
             return JsonResult.errorResult(ErrorEnum.E_1002);
         }
 
-        if (userMapper.insertUser(user) == 0) {
+        if (userDao.insertUser(user) == 0) {
             // 其他原因导致没有插入，创建用户失败
             return JsonResult.errorResult(ErrorEnum.E_1001);
         }
@@ -60,25 +68,40 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /**
+     * 根据用户id删除用户
+     * @param id 用户 id
+     * @return JSONObject
+     */
     @Override
     public JSONObject deleteUserById(int id) {
-        User user = userMapper.selectUserById(id);
+        User user = userDao.selectUserById(id);
         if(user!=null) {
-            userMapper.deleteByUserId(id);
+            userDao.deleteByUserId(id);
             return JsonResult.successResult("删除成功");
         }
         else return JsonResult.errorResult(ErrorEnum.E_1003); // 用户不存在
 
     }
 
+    /**
+     * 根据用户id更新用户信息
+     * @param user 用户对象
+     * @return JSONObject
+     */
     @Override
     public JSONObject updateUserById(User user) {
-        userMapper.updateUserById(user);
+        userDao.updateUserById(user);
         return JsonResult.successResult("更新成功");
     }
 
+    /**
+     * 根据用户邮箱更新用户信息
+     * @param user 用户对象
+     * @return JSONObject
+     */
     public JSONObject updateUserByEmail(User user){
-        userMapper.updateUserByEmail(user);
+        userDao.updateUserByEmail(user);
         return JsonResult.successResult("更新成功");
     }
 }

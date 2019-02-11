@@ -87,7 +87,7 @@ public class CommentServiceImpl implements CommentService {
             return JsonResult.errorResult(ErrorEnum.E_6003);
         }
         else{
-            return JsonResult.successResult();
+            return JsonResult.successResult("删除评论成功");
         }
     }
 }

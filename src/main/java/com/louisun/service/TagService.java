@@ -6,7 +6,6 @@ import com.louisun.model.Tag;
 public interface TagService {
     /**
      * 获取所有版块
-     * @param null
      * @return JSONObject
      * @author YeJianan
      * @date 2019/1/28 16:10

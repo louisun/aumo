@@ -16,7 +16,6 @@
 
     <resultMap id="PostCommentMap" type="com.louisun.model.Post" extends="PostMap">
         <collection property="commentList"
-                    fetchType="lazy"
                     column="{postId=post_id}"
                     select="com.louisun.dao.CommentDao.selectByPostId"
         />
@@ -29,11 +28,11 @@
     </delete>
 
     <insert id="insertPost" parameterType="com.louisun.model.Post">
-        insert into post (post_id, tag_id, user_id,
-                          title, comment_amount,
+        insert into post (tag_id, user_id,
+                          title,
                           content, content_md)
-        values (#{postId,jdbcType=INTEGER}, #{tagId,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER},
-                #{title,jdbcType=VARCHAR}, #{commentAmount,jdbcType=INTEGER},
+        values (#{tagId,jdbcType=INTEGER}, #{userId,jdbcType=INTEGER},
+                #{title,jdbcType=VARCHAR},
                 #{content,jdbcType=LONGVARCHAR}, #{contentMd,jdbcType=LONGVARCHAR})
     </insert>
 

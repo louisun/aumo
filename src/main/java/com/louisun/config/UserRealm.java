@@ -1,25 +1,18 @@
 package com.louisun.config;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.louisun.model.User;
 import com.louisun.service.LoginService;
-import com.louisun.service.UserService;
-import com.louisun.util.constant.SessionKeyEnum;
-import org.apache.shiro.SecurityUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 
 
+@Slf4j
 public class UserRealm extends AuthorizingRealm {
-    private Logger logger = LoggerFactory.getLogger(UserRealm.class);
-
     @Autowired
     @Lazy
     private LoginService loginService;
@@ -39,19 +32,19 @@ public class UserRealm extends AuthorizingRealm {
             throw new UnknownAccountException();
         }
         // authenticationInfo 交给 AuthenticatingRealm 使用 CredentialsMatcher 与 authenticationToken 进行密码匹配，还可以自定义实现
-        SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(
+
+//        JSONObject jsonSessionObject = new JSONObject();
+//        jsonSessionObject.put("email", user.getEmail());
+//        jsonSessionObject.put("nickname", user.getNickname());
+
+        // 将用户信息放入 session 中
+//        SecurityUtils.getSubject().getSession().setAttribute(SessionKeyEnum.SESSION_USER_INFO,jsonSessionObject);
+
+        return new SimpleAuthenticationInfo(
                 user.getEmail(),
                 user.getPassword(),
                 getName() // 当前 UserRealm 类的方法，获取 Realm Name
         );
-
-        JSONObject jsonSessionObject = new JSONObject();
-        jsonSessionObject.put("email", user.getEmail());
-        jsonSessionObject.put("nickname", user.getNickname());
-
-        // 将用户信息放入 session 中
-//        SecurityUtils.getSubject().getSession().setAttribute(SessionKeyEnum.SESSION_USER_INFO,jsonSessionObject);
-        return authenticationInfo;
 
     }
 

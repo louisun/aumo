@@ -2,6 +2,7 @@ package com.louisun.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.louisun.service.LoginService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,6 +13,7 @@ import javax.servlet.http.HttpSession;
 
 
 @RestController
+@Slf4j
 @SessionAttributes(names = {"email"})
 public class LoginController {
     private final LoginService loginService;
@@ -32,7 +34,8 @@ public class LoginController {
         JSONObject loginResponse =  loginService.authLogin(loginRequest);
         // 若登录成功，在 Session 中保存用户邮箱
         if(loginResponse.getString("returnCode").equals("200")){
-            session.setAttribute("email", loginRequest.getString("email"));
+            session.setAttribute("userId", loginResponse.getJSONObject("returnData").getIntValue("userId"));
+            log.warn("user id is " + loginResponse.getJSONObject("returnData").getIntValue("userId"));
         }
         return loginResponse;
     }

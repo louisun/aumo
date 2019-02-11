@@ -19,7 +19,6 @@ public class TagController {
     /**
      * 获取所有标签
      *
-     * @param null
      * @return JSONObject
      */
     @GetMapping("/tags")

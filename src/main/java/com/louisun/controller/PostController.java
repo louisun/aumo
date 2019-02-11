@@ -52,6 +52,6 @@ public class PostController {
      */
     @GetMapping("/post/{postId}")
     public JSONObject getPostsByPostId(@PathVariable("postId") Integer postId){
-        return postService.getPostsByUserId(postId);
+        return postService.getPostById(postId);
     }
 }

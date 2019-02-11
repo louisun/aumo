@@ -26,7 +26,6 @@ public class TagServiceImpl implements TagService {
 
     /**
      * 获取所有版块
-     * @param null
      * @return JSONObject
      * @author YeJianan
      * @date 2019/1/28 16:10
@@ -45,7 +44,7 @@ public class TagServiceImpl implements TagService {
 
     /**
      * 插入新版块
-     * @param tag 版块
+     * @param tagId 版块id
      * @return JSONObject
      * @author YeJianan
      * @date 2019/1/28 20:18
@@ -69,9 +68,13 @@ public class TagServiceImpl implements TagService {
      */
     @Override
     public JSONObject insertTag(Tag tag) {
-        if (tagDao.insertTag(tag) == 0) {
+        if (tag.getName() == null) {
             return JsonResult.errorResult(ErrorEnum.E_5001);
-        } else {
+        }
+        if(tagDao.insertTag(tag) == 0){
+            return JsonResult.errorResult(ErrorEnum.E_5001);
+        }
+        else{
             return JsonResult.successResult("添加版块成功");
         }
     }

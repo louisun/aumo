@@ -1,6 +1,8 @@
 package com.louisun.dao;
 
 import com.louisun.model.Post;
+import org.apache.ibatis.annotations.Mapper;
+
 import java.util.List;
 
 /**
@@ -8,6 +10,7 @@ import java.util.List;
  * 查询帖子时在，只有在详情页面，Post中才会存入评论列表，即 selectPostWithCommentsByPostId
  * 其余查询帖子（或列表），都是无 commentList 的 Post
  */
+@Mapper
 public interface PostDao {
 
     /**

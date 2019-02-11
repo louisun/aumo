@@ -52,11 +52,11 @@ public class LoginServiceImpl implements LoginService {
 
     private JSONObject getBasicUserInfo(User user) {
         JSONObject jsonResult = new JSONObject();
-        jsonResult.put("user_id", user.getUserId());
+        jsonResult.put("userId", user.getUserId());
         jsonResult.put("email", user.getEmail());
         jsonResult.put("nickname", user.getNickname());
         jsonResult.put("moto", user.getMoto());
-        jsonResult.put("avatar_path", user.getAvatarPath());
+        jsonResult.put("avatarPath", user.getAvatarPath());
 
         return JsonResult.successResult(jsonResult);
     }

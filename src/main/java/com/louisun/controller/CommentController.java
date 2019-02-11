@@ -60,7 +60,7 @@ public class CommentController {
      */
     @DeleteMapping("/user/{userId}/comment/{commentId}")
     public JSONObject deleteComment(@SessionAttribute("userId") Integer currentUserId, @PathVariable("userId") Integer userId, @PathVariable("commentId") Integer commentId){
-        if(currentUserId == userId){
+        if(currentUserId.equals(userId)){
             return commentService.deleteCommentByCommentId(commentId);
         }
         else{

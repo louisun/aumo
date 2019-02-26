@@ -27,7 +27,7 @@
         update_time
     </sql>
 
-    <select id="selectUserById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    <select id="selectUserById" parameterType="java.lang.Integer" resultMap="BaseResultMap" useCache="true">
         select
         <include refid="Base_Column_List"/>
         from user

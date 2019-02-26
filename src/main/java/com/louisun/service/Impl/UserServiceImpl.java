@@ -7,7 +7,10 @@ import com.louisun.service.UserService;
 import com.louisun.util.JsonResult;
 import com.louisun.util.constant.ErrorEnum;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -21,87 +24,37 @@ public class UserServiceImpl implements UserService {
     /**
      * 根据用户id得到用户对象
      * @param id  用户id
-     * @return JSONObject
+     * @return User
      */
     @Override
-    public JSONObject getUserById(int id) {
-        User user = userDao.selectUserById(id);
-        if(user!=null){
-            return JsonResult.successResult(user);
-        }
-        else return JsonResult.errorResult(ErrorEnum.E_1003); // 用户不存在
+    @Cacheable(value="user", key="'user_'+#id", unless = "#result == null")
+    public User getUserById(int id) {
+        return userDao.selectUserById(id);
     }
 
-    /**
-     * 根据用户邮箱更新用户信息
-     * @param email 邮箱名
-     * @return JSONObject
-     */
-    @Override
-    public JSONObject getUserByEmail(String email) {
-        User user = userDao.selectUserByEmail(email);
-        if(user!=null){
-            return JsonResult.successResult(user);
-        }
-        else return JsonResult.errorResult(ErrorEnum.E_1003); // 用户不存在
-    }
 
 
     /**
      * 新增用户
      * @param user 用户对象
-     * @return JSONObject
+     * @return int
      */
     @Override
-    public JSONObject insertUser(User user) {
-        if (userDao.selectUserByEmail(user.getEmail()) != null) {
-            // 用户已存在
-            return JsonResult.errorResult(ErrorEnum.E_1002);
-        }
-
-        if (userDao.insertUser(user) == 0) {
-            // 其他原因导致没有插入，创建用户失败
-            return JsonResult.errorResult(ErrorEnum.E_1001);
-        }
-        else{
-            return JsonResult.successResult(user);
-        }
+    @Transactional
+    public int insertUser(User user) {
+        return userDao.insertUser(user);
     }
 
-    /**
-     * 根据用户id删除用户
-     * @param id 用户 id
-     * @return JSONObject
-     */
-    @Override
-    public JSONObject deleteUserById(int id) {
-        User user = userDao.selectUserById(id);
-        if(user!=null) {
-            userDao.deleteByUserId(id);
-            return JsonResult.successResult("删除成功");
-        }
-        else return JsonResult.errorResult(ErrorEnum.E_1003); // 用户不存在
-
-    }
 
     /**
      * 根据用户id更新用户信息
      * @param user 用户对象
-     * @return JSONObject
+     * @return int
      */
     @Override
-    public JSONObject updateUserById(User user) {
-        userDao.updateUserById(user);
-        return JsonResult.successResult("更新成功");
+    @CacheEvict(value="user", key="'user_'+#user.userId", condition = "#result > 0")
+    public int updateUserById(User user) {
+        return userDao.updateUserById(user);
     }
 
-    /**
-     * 根据用户邮箱更新用户信息
-     * @param user 用户对象
-     * @return JSONObject
-     */
-    public JSONObject updateUserByEmail(User user){
-        userDao.updateUserByEmail(user);
-        return JsonResult.successResult("更新成功");
-    }
 }

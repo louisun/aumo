@@ -3,11 +3,13 @@ package com.louisun.model;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Getter
 @Setter
-public class Comment {
+public class Comment implements Serializable {
+    private static final long serialVersionUID = 3418783989880085784L;
     /**
      * 评论 ID
      */

@@ -10,44 +10,24 @@ public interface UserService {
      * @param id  用户id
      * @return JSONObject
      */
-    JSONObject getUserById(int id);
+    User getUserById(int id);
 
 
-
-    /**
-     * 根据邮箱得到用户对象
-     * @param email 用户邮箱
-     * @return JSONObject
-     */
-    JSONObject getUserByEmail(String email);
 
     /**
      * 根据用户id更新用户信息
      * @param user 用户对象
-     * @return JSONObject
+     * @return int
      */
-    JSONObject updateUserById(User user);
+    int updateUserById(User user);
 
-    /**
-     * 根据用户邮箱更新用户信息
-     * @param user 用户对象
-     * @return JSONObject
-     */
-    JSONObject updateUserByEmail(User user);
 
 
     /**
      * 新增用户
      * @param user 用户对象
-     * @return JSONObject
+     * @return int
      */
-    JSONObject insertUser(User user);
+    int insertUser(User user);
 
-
-    /**
-     * 根据用户id删除用户
-     * @param id 用户 id
-     * @return JSONObject
-     */
-    JSONObject deleteUserById(int id);
 }

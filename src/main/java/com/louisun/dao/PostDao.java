@@ -2,6 +2,7 @@ package com.louisun.dao;
 
 import com.louisun.model.Post;
 import org.apache.ibatis.annotations.Mapper;
+import org.springframework.cache.annotation.CachePut;
 
 import java.util.List;
 

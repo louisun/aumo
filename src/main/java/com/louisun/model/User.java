@@ -3,11 +3,14 @@ package com.louisun.model;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Getter
 @Setter
-public class User {
+public class User implements Serializable {
+    private static final long serialVersionUID = 7769459516931247567L;
+    
     /**
      * 用户 ID
      */

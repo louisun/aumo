@@ -3,8 +3,12 @@ package com.louisun.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.louisun.model.Post;
 import com.louisun.service.PostService;
+import com.louisun.util.JsonResult;
+import com.louisun.util.constant.ErrorEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 public class PostController {
@@ -22,7 +26,13 @@ public class PostController {
      */
     @PostMapping("/post")
     public JSONObject addPost(@RequestBody Post post){
-        return postService.insertPost(post);
+        int result = postService.insertPost(post);
+        if(result > 0){
+            return JsonResult.successResult("保存帖子成功");
+        }
+        else{
+            return JsonResult.errorResult(ErrorEnum.E_4001);
+        }
     }
 
     /**
@@ -32,7 +42,13 @@ public class PostController {
      */
     @GetMapping("/tag/{tagId}/posts")
     public JSONObject getPostsByTag(@PathVariable("tagId") Integer tagId){
-        return postService.getPostsByTag(tagId);
+        List<Post> postList =  postService.getPostsByTag(tagId);
+        if(postList == null){
+            return JsonResult.errorResult(ErrorEnum.E_4002);
+        }
+        else{
+            return JsonResult.successResult(postList);
+        }
     }
 
     /**
@@ -42,7 +58,13 @@ public class PostController {
      */
     @GetMapping("/user/{userId}/posts")
     public JSONObject getPostsByUserId(@PathVariable("userId") Integer userId){
-        return postService.getPostsByUserId(userId);
+        List<Post> postList =  postService.getPostsByUserId(userId);
+        if(postList == null){
+            return JsonResult.errorResult(ErrorEnum.E_4002);
+        }
+        else{
+            return JsonResult.successResult(postList);
+        }
     }
 
     /**
@@ -52,6 +74,12 @@ public class PostController {
      */
     @GetMapping("/post/{postId}")
     public JSONObject getPostsByPostId(@PathVariable("postId") Integer postId){
-        return postService.getPostById(postId);
+        Post post = postService.getPostById(postId);
+        if(post == null){
+            return JsonResult.errorResult(ErrorEnum.E_4002);
+        }
+        else{
+            return JsonResult.successResult(post);
+        }
     }
 }

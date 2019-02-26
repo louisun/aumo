@@ -3,12 +3,15 @@ package com.louisun.model;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
 @Getter
 @Setter
-public class Post {
+public class Post implements Serializable {
+    private  static final long serialVersionUID = 4383086922048229913L;
+
     /**
      * 文章 ID
      */

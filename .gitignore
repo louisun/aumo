@@ -163,3 +163,4 @@ src/test/
 application.yaml
 generatorconfig.xml
 /resources/
+redis.properties

@@ -1,14 +1,16 @@
 package com.louisun.service.Impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.louisun.dao.PostDao;
 import com.louisun.model.Post;
 import com.louisun.service.PostService;
 import com.louisun.util.MarkdownRenderer;
+import com.louisun.util.PageBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 
 @Service
 public class PostServiceImpl  implements PostService {
@@ -42,9 +44,13 @@ public class PostServiceImpl  implements PostService {
      * @date 2019/1/27 23:40
      */
     @Override
-    @Cacheable(value="post", key="'postlist_tag_'+#tagId", unless = "#result == null")
-    public List<Post> getPostsByTag(int tagId) {
-        return postDao.selectByTagId(tagId);
+    public PageBean<Post> getPostsByTag(int tagId, int currentPage, int pageSize) {
+        PageHelper.startPage(currentPage, pageSize);
+        // 拦截器机制，会拦截 SQL
+        Page<Post> allPosts = (Page<Post>) postDao.selectByTagId(tagId);
+        PageBean<Post> pageData = new PageBean<>(currentPage, pageSize, (int)allPosts.getTotal());
+        pageData.setItems(allPosts.getResult());
+        return pageData;
     }
 
     /**
@@ -55,10 +61,13 @@ public class PostServiceImpl  implements PostService {
      * @date 2019/1/27 23:41
      */
     @Override
-    @Cacheable(value="post", key="'postlist_user_'+#userId", unless = "#result == null")
-    public List<Post> getPostsByUserId(int userId) {
-        return postDao.selectByUserId(userId);
-
+    public PageBean<Post> getPostsByUserId(int userId, int currentPage, int pageSize) {
+        PageHelper.startPage(currentPage, pageSize);
+        // 拦截器机制，会拦截 SQL
+        Page<Post> allPosts = (Page<Post>) postDao.selectByUserId(userId);
+        PageBean<Post> pageData = new PageBean<>(currentPage, pageSize, (int)allPosts.getTotal());
+        pageData.setItems(allPosts.getResult());
+        return pageData;
     }
 
     /**

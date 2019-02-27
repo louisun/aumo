@@ -1,7 +1,9 @@
 package com.louisun.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.Page;
 import com.louisun.model.Post;
+import com.louisun.util.PageBean;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Repository;
@@ -25,7 +27,7 @@ public interface PostService {
      * @author YeJianan
      * @date 2019/1/27 23:40
      */
-    List<Post> getPostsByTag(int tagId);
+    PageBean<Post> getPostsByTag(int tagId, int currentPage, int pageSize);
 
     /**
      * 根据 userId 获取某用户所有帖子基本信息列表
@@ -34,7 +36,7 @@ public interface PostService {
      * @author YeJianan
      * @date 2019/1/27 23:41
      */
-    List<Post> getPostsByUserId(int userId);
+    PageBean<Post> getPostsByUserId(int userId, int currentPage, int pageSize);
 
     /**
      * 根据 postId 获取帖子详细内容（包含评论列表）

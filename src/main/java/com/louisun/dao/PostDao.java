@@ -1,5 +1,6 @@
 package com.louisun.dao;
 
+import com.github.pagehelper.Page;
 import com.louisun.model.Post;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.cache.annotation.CachePut;

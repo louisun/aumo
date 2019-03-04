@@ -2,11 +2,13 @@ package com.louisun.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.louisun.model.User;
+import com.louisun.service.RankService;
 import com.louisun.service.UserService;
 import com.louisun.util.JsonResult;
 import com.louisun.util.constant.ErrorEnum;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -20,10 +22,12 @@ import java.io.IOException;
 @Slf4j
 public class UserController {
     private final UserService userService;
+    private final RankService rankService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, RankService rankService) {
         this.userService = userService;
+        this.rankService = rankService;
     }
 
     /**
@@ -51,19 +55,37 @@ public class UserController {
     @GetMapping("/user/{id}")
     public JSONObject getUser(@PathVariable("id") int userId) {
         User user = userService.getUserById(userId);
-        if (user != null) return JsonResult.successResult(user);
+        if (user != null){
+            rankService.removeUser(userId);
+            return JsonResult.successResult(user);
+        }
         else return JsonResult.errorResult(ErrorEnum.E_1003); // 用户不存在
+    }
+
+    /**
+     * 根据用户id封禁某用户 /ban/user/{id} POST
+     *
+     * @param userId 用户 id
+     * @return JSONObject
+     */
+    @RequiresPermissions("user:ban")
+    @PostMapping("/ban/user/{userId}")
+    public JSONObject banUser(@PathVariable("userId") int userId) {
+        int n = userService.banUser(userId);
+        if(n == 0) return JsonResult.errorResult(ErrorEnum.E_1003); // 用户不存在
+        else return JsonResult.successResult("封禁用户成功");
+
     }
 
     /**
      * 获取当前用户的信息 /user GET
      *
-     * @param userId 当前 session 中保存的用户id
+     * @param userInfo 当前 session 中保存的用户信息
      * @return JSONObject
      */
     @GetMapping("/user")
-    public JSONObject getCurrentUser(@SessionAttribute("userId") int userId) {
-        User user = userService.getUserById(userId);
+    public JSONObject getCurrentUser(@SessionAttribute("userInfo") JSONObject userInfo) {
+        User user = userService.getUserById(userInfo.getIntValue("userId"));
         if (user != null) return JsonResult.successResult(user);
         else return JsonResult.errorResult(ErrorEnum.E_1003); // 用户不存在
     }
@@ -72,15 +94,16 @@ public class UserController {
     /**
      * 更新当前用户的部分信息
      *
-     * @param userId        当前 session 中保存的用户id
+     * @param userInfo        当前 session 中保存的用户信息
      * @param updateRequest 请求更新的信息
      * @param type          更新类型: basic（昵称、个性签名），password（密码）
      * @return JSONObject
      */
     @PatchMapping("/user")
-    public JSONObject updateUser(@SessionAttribute("userId") int userId, @RequestBody JSONObject updateRequest, @RequestParam(value = "type") String type) {
+    public JSONObject updateUser(@SessionAttribute("userInfo") JSONObject userInfo, @RequestBody JSONObject updateRequest, @RequestParam(value = "type") String type) {
 
         User user = new User();
+        int userId = userInfo.getIntValue("userId");
         user.setUserId(userId);
         if (type.equals("basic")) {
             // 修改昵称和个性签名
@@ -109,13 +132,13 @@ public class UserController {
     /**
      * 设置当前用户头像
      *
-     * @param userId        当前 session 中保存的用户id
+     * @param userInfo        当前 session 中保存的用户信息
      * @param uploadPicture 用户上传的图片
      * @return JSONObject
      */
     @PostMapping("/avatar")
-    public JSONObject uploadAvatar(@SessionAttribute("userId") int userId, MultipartFile uploadPicture) {
-        File dest = new File(userId + ".jpg");
+    public JSONObject uploadAvatar(@SessionAttribute("userInfo") JSONObject userInfo, MultipartFile uploadPicture) {
+        File dest = new File(userInfo.getIntValue("userId") + ".jpg");
         try {
             uploadPicture.transferTo(dest);
         } catch (IOException e) {

@@ -21,6 +21,22 @@
         />
     </resultMap>
 
+    <resultMap id="RankInfoMap" type="com.louisun.dto.PostRankInfo">
+        <id column="post_id" jdbcType="INTEGER" property="postId"/>
+        <result column="post_title" jdbcType="VARCHAR" property="postTitle"/>
+        <result column="user_id" jdbcType="VARCHAR" property="userId"/>
+        <result column="cnt" jdbcType="INTEGER" property="commentCount"/>
+    </resultMap>
+
+    <select id="getPostRankInfoList" resultMap="RankInfoMap">
+        SELECT p.post_id, p.user_id, p.title, u.nickname, COUNT(c.comment_id) as cnt
+        FROM post p
+                 JOIN user u ON p.user_id = u.user_id
+                 LEFT JOIN comment c on p.post_id = c.post_id
+        GROUP BY p.post_id
+        ORDER BY cnt DESC
+    </select>
+
     <delete id="deleteByPostId" parameterType="java.lang.Integer">
         delete
         from post

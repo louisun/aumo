@@ -1,9 +1,8 @@
 package com.louisun.dao;
 
-import com.github.pagehelper.Page;
+import com.louisun.dto.PostRankInfo;
 import com.louisun.model.Post;
 import org.apache.ibatis.annotations.Mapper;
-import org.springframework.cache.annotation.CachePut;
 
 import java.util.List;
 
@@ -14,6 +13,7 @@ import java.util.List;
  */
 @Mapper
 public interface PostDao {
+    List<PostRankInfo> getPostRankInfoList();
 
     /**
      * 删除帖子

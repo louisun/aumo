@@ -2,14 +2,20 @@ package com.louisun.service.Impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.louisun.dao.CommentDao;
 import com.louisun.dao.PostDao;
+import com.louisun.dto.PostRankInfo;
+import com.louisun.model.Comment;
 import com.louisun.model.Post;
 import com.louisun.service.PostService;
 import com.louisun.util.MarkdownRenderer;
 import com.louisun.util.PageBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 
 @Service
@@ -17,9 +23,23 @@ public class PostServiceImpl  implements PostService {
 
     private final PostDao postDao;
 
+
+    private final CommentDao commentDao;
+
+    private final PostServiceHelper postServiceHelper;
+
+
+
     @Autowired
-    public PostServiceImpl(PostDao postDao) {
+    public PostServiceImpl(PostDao postDao, CommentDao commentDao, PostServiceHelper postServiceHelper) {
         this.postDao = postDao;
+        this.commentDao = commentDao;
+        this.postServiceHelper = postServiceHelper;
+    }
+
+    @Override
+    public List<PostRankInfo> getPostRankInfoList() {
+        return postDao.getPostRankInfoList();
     }
 
     /**
@@ -78,9 +98,60 @@ public class PostServiceImpl  implements PostService {
      * @date 2019/1/27 23:42
      */
     @Override
-    @Cacheable(value="post", key="'post_'+#postId", unless = "#result == null")
     public Post getPostById(int postId) {
         // 注意 Mapper 中如果用 selectByPostId 无法获得评论列表
-        return postDao.selectPostWithCommentsByPostId(postId);
+        // 本来是用 selectPostWithCommentsByPostId 获取完整的 Post，但是这样缓存就和 comment 耦合
+        Post post = postServiceHelper.getBasicPostById(postId);
+        if(post == null) return null;
+        List<Comment> commentList = commentDao.selectByPostId(postId);
+        post.setCommentList(commentList);
+        return post;
     }
+
+    /**
+     * 根据 postId 获取帖子基本内容（不含评论列表）
+     *
+     * @param postId 帖子 ID
+     * @return JSONObject
+     * @author YeJianan
+     * @date 2019/1/27 23:43
+     */
+    @Override
+    public Post getBasicPostById(int postId) {
+        // 内部调用这个，缓存失效，要放在不同类中
+        return postDao.selectByPostId(postId);
+    }
+
+
+
+    @Override
+    @CacheEvict(value="post", key="'post_'+#postId")
+    public int deletePost(int postId) {
+        return postDao.deleteByPostId(postId);
+    }
+}
+
+
+@Service
+class PostServiceHelper{
+    @Autowired
+    private final PostDao postDao;
+
+    PostServiceHelper(PostDao postDao) {
+        this.postDao = postDao;
+    }
+
+    /**
+     * 根据 postId 获取帖子基本内容（不含评论列表）
+     *
+     * @param postId 帖子 ID
+     * @return JSONObject
+     * @author YeJianan
+     * @date 2019/1/27 23:43
+     */
+    @Cacheable(value="post", key="'post_'+#postId", unless = "#result == null")
+    public Post getBasicPostById(int postId) {
+        return postDao.selectByPostId(postId);
+    }
+
 }

@@ -14,6 +14,13 @@ public interface LoginService {
     JSONObject authLogin(JSONObject jsonObject);
 
     /**
+     * 退出登录
+     * @return JSONObject
+     * @date 2018-12-26
+     */
+    JSONObject logout();
+
+    /**
      * 根据用户名和密码查询对应的用户
      * @param email 邮箱
      * @return User

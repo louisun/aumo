@@ -2,6 +2,8 @@ package com.louisun.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
+import com.louisun.dto.PostRankInfo;
+import com.louisun.dto.UserRankInfo;
 import com.louisun.model.Post;
 import com.louisun.util.PageBean;
 import org.springframework.cache.annotation.CacheConfig;
@@ -11,6 +13,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 public interface PostService {
+
+    List<PostRankInfo> getPostRankInfoList();
+
     /**
      * 保存帖子信息
      * @param post 帖子：包含 postId, tagId, userId, title, content, contentMd
@@ -46,4 +51,15 @@ public interface PostService {
      * @date 2019/1/27 23:42
      */
     Post getPostById(int postId);
+
+    /**
+     * 根据 postId 获取帖子基本内容（不含评论列表）
+     * @param postId 帖子 ID
+     * @return JSONObject
+     * @author YeJianan
+     * @date 2019/1/27 23:43
+     */
+    Post getBasicPostById(int postId);
+
+    int deletePost(int postId);
 }

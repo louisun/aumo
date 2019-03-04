@@ -45,6 +45,7 @@ public class CustomFilter extends UserFilter {
     }
 
 
+
     @Override
     protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
         JSONObject jsonObject = new JSONObject();

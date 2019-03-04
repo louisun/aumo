@@ -14,18 +14,32 @@
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
 
+    <resultMap id="RankInfoMap" type="com.louisun.dto.UserRankInfo">
+        <id column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="nickname" jdbcType="VARCHAR" property="nickname"/>
+        <result column="cnt" jdbcType="INTEGER" property="postCount"/>
+    </resultMap>
+
     <sql id="Base_Column_List">
-        user_id,
-        email,
-        password,
-        nickname,
-        role_id,
-        moto,
-        avatar_path,
-        disabled,
-        create_time,
-        update_time
+            user_id,
+            email,
+            password,
+            nickname,
+            role_id,
+            moto,
+            avatar_path,
+            disabled,
+            create_time,
+            update_time
     </sql>
+
+    <select id="getUserRankInfoList" resultMap="RankInfoMap">
+        SELECT u.user_id, u.nickname, COUNT(*) as cnt
+        from user u
+                 JOIN post p ON p.user_id = u.user_id
+        GROUP BY u.user_id
+        ORDER BY cnt DESC
+    </select>
 
     <select id="selectUserById" parameterType="java.lang.Integer" resultMap="BaseResultMap" useCache="true">
         select

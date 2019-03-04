@@ -3,6 +3,7 @@ package com.louisun.util.constant;
 import com.alibaba.druid.wall.violation.ErrorCode;
 
 public enum ErrorEnum {
+    E_0001("0001", "无权限"),
     /**
      * 创建用户相关的错误码
      */
@@ -15,6 +16,7 @@ public enum ErrorEnum {
      */
     E_2001("2001", "登录失败"),
     E_2002("2002", "登出失败"),
+    E_2003("2003", "登录失败，该账号已被禁用"),
 
     /**
      * 修改个人信息相关的错误码
@@ -30,6 +32,7 @@ public enum ErrorEnum {
     E_4001("4001","保存帖子失败"),
     E_4002("4002","获取帖子失败"),
     E_4003("4003","修改帖子失败"),
+    E_4004("4004","删除帖子失败"),
 
     /**
      * 与版块相关的错误码

@@ -2,22 +2,28 @@ package com.louisun.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.louisun.model.Comment;
+import com.louisun.model.Post;
 import com.louisun.service.CommentService;
+import com.louisun.service.RankService;
 import com.louisun.util.JsonResult;
 import com.louisun.util.constant.ErrorEnum;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
+import java.util.List;
 
 @RestController
 public class CommentController {
 
     private final CommentService commentService;
 
+    private final RankService rankService;
+
     @Autowired
-    public CommentController(CommentService commentService) {
+    public CommentController(CommentService commentService, RankService rankService) {
         this.commentService = commentService;
+        this.rankService = rankService;
     }
 
     /**
@@ -28,7 +34,15 @@ public class CommentController {
     @PostMapping("/post/{postId}/comment")
     public JSONObject addComment(@RequestBody Comment comment, @PathVariable("postId") Integer postId){
         comment.setPostId(postId);
-        return commentService.insertComment(comment);
+        int n = commentService.insertComment(comment);
+        if(n==0){
+            return  JsonResult.errorResult(ErrorEnum.E_6001);
+        }
+        else{
+            // 在缓存中对 rank:post 对应 userId 的帖子数+1
+            rankService.addPostScore(postId, 1);
+            return JsonResult.successResult(comment);
+        }
     }
 
     /**
@@ -38,7 +52,8 @@ public class CommentController {
      */
     @GetMapping("/post/{postId}/comments")
     public JSONObject getCommentsByPostId(@PathVariable("postId") Integer postId){
-        return commentService.getCommentByPostId(postId);
+        List<Comment> commentList = commentService.getCommentsByPostId(postId);
+        return JsonResult.successResult(commentList);
     }
 
     /**
@@ -48,23 +63,25 @@ public class CommentController {
      */
     @GetMapping("/user/{userId}/comments")
     public  JSONObject getCommentsByUserId(@PathVariable("userId") Integer userId){
-        return commentService.getCommentByUserId(userId);
+        List<Comment> commentList = commentService.getCommentByUserId(userId);
+        return JsonResult.successResult(commentList);
     }
 
-    /**
-     * 删除当前用户的某条评论 /post/{postId}/comments/ DELETE
-     * @param currentUserId 当前 session 中保存的用户id
-     * @param userId 用户id
-     * @param commentId 帖子id
-     * @return  JSONObject
-     */
-    @DeleteMapping("/user/{userId}/comment/{commentId}")
-    public JSONObject deleteComment(@SessionAttribute("userId") Integer currentUserId, @PathVariable("userId") Integer userId, @PathVariable("commentId") Integer commentId){
-        if(currentUserId.equals(userId)){
-            return commentService.deleteCommentByCommentId(commentId);
+
+
+    @RequiresPermissions("comment:delete")
+    @DeleteMapping("/comment/{commentId}")
+    public JSONObject deleteComment(@PathVariable("commentId") Integer commentId){
+        Comment comment = commentService.getCommentById(commentId);
+        int n = commentService.deleteCommentByCommentId(commentId);
+        if(n==0){
+            return JsonResult.errorResult(ErrorEnum.E_6003);
         }
         else{
-            return JsonResult.errorResult(ErrorEnum.E_6003); // 不能删除其他用户的评论
+
+            // 在缓存中对 rank:post 对应 userId 的帖子数-1
+            rankService.addPostScore(comment.getPostId(), -1);
+            return JsonResult.successResult("删除评论成功");
         }
     }
 }

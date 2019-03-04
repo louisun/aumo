@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.louisun.dao.PermissionDao">
+
+    <select id="getUserPermissions" resultType="String">
+      SELECT p.permission_code
+      FROM permission p
+      LEFT JOIN role_permission rp on rp.permission_id = p.id
+      LEFT JOIN role r ON r.role_id = rp.role_id
+      LEFT JOIN user u on u.role_id = r.role_id
+      WHERE u.user_id = #{userId,jdbcType=INTEGER}
+    </select>
+
+</mapper>

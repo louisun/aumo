@@ -1,7 +1,9 @@
 package com.louisun.service.Impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.louisun.dao.RedisDao;
 import com.louisun.dao.UserDao;
+import com.louisun.dto.UserRankInfo;
 import com.louisun.model.User;
 import com.louisun.service.UserService;
 import com.louisun.util.JsonResult;
@@ -12,13 +14,21 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class UserServiceImpl implements UserService {
     private final UserDao userDao;
 
+
     @Autowired
     public UserServiceImpl(UserDao userDao) {
         this.userDao = userDao;
+    }
+
+    @Override
+    public List<UserRankInfo> getUserRankInfoList() {
+        return userDao.getUserRankInfoList();
     }
 
     /**
@@ -57,4 +67,19 @@ public class UserServiceImpl implements UserService {
         return userDao.updateUserById(user);
     }
 
+
+    /**
+     * 根据用户id禁用用户
+     * @param userId 用户id
+     * @return int
+     */
+    @CacheEvict(value="user", key="'user_'+#userId", condition = "#result > 0")
+    @Override
+    public int banUser(int userId){
+        User user = new User();
+        user.setUserId(userId);
+        user.setDisabled(true);
+        return userDao.updateUserById(user);
+
+    }
 }

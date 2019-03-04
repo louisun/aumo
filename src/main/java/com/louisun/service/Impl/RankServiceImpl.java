@@ -12,8 +12,8 @@ import java.util.Set;
 @Service
 public class RankServiceImpl implements RankService {
 
-    private static String RANK_LIST_USER = "rank:user";
-    private static String RANK_LIST_POST = "rank:post";
+    private static String RANK_LIST_USER = "rank::user";
+    private static String RANK_LIST_POST = "rank::post";
 
     @Autowired
     private RedisDao redisDao;

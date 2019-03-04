@@ -56,7 +56,6 @@ public class UserController {
     public JSONObject getUser(@PathVariable("id") int userId) {
         User user = userService.getUserById(userId);
         if (user != null){
-            rankService.removeUser(userId);
             return JsonResult.successResult(user);
         }
         else return JsonResult.errorResult(ErrorEnum.E_1003); // 用户不存在
@@ -73,7 +72,10 @@ public class UserController {
     public JSONObject banUser(@PathVariable("userId") int userId) {
         int n = userService.banUser(userId);
         if(n == 0) return JsonResult.errorResult(ErrorEnum.E_1003); // 用户不存在
-        else return JsonResult.successResult("封禁用户成功");
+        else{
+            rankService.removeUser(userId);
+            return JsonResult.successResult("封禁用户成功");
+        }
 
     }
 
